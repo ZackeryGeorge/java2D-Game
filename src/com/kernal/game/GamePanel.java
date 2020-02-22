@@ -1,7 +1,14 @@
 package com.kernal.game;
 
+import com.kernal.game.states.GameStateManager;
+import com.kernal.game.util.KeyHandler;
+import com.kernal.game.util.MouseHandler;
+
 import javax.swing.JPanel;
-import java.awt.*;
+import java.awt.Graphics2D;
+import java.awt.Graphics;
+import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 
 public class GamePanel extends JPanel implements Runnable {
@@ -14,6 +21,11 @@ public class GamePanel extends JPanel implements Runnable {
 
     private BufferedImage img;
     private Graphics2D g;
+
+    private MouseHandler mouse;
+    private KeyHandler key;
+
+    private GameStateManager gsm;
 
     public GamePanel(int width, int height) {
         GamePanel.width = width;
@@ -38,6 +50,11 @@ public class GamePanel extends JPanel implements Runnable {
 
         img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         g = (Graphics2D) img.getGraphics();
+
+        mouse = new MouseHandler();
+        key = new KeyHandler();
+
+        gsm = new GameStateManager();
     }
 
     public void run() {
@@ -64,7 +81,7 @@ public class GamePanel extends JPanel implements Runnable {
 
             while (((now - lastUpdateTime) > TBU) && (updateCount < MUBR)) {
                 update();
-                input();
+                input(mouse, key);
                 lastUpdateTime += TBU;
                 updateCount++;
             }
@@ -73,7 +90,7 @@ public class GamePanel extends JPanel implements Runnable {
                 lastUpdateTime = now - TBU;
             }
 
-            input();
+            input(mouse, key);
             render();
             draw();
             lastRenderTime = now;
@@ -106,17 +123,18 @@ public class GamePanel extends JPanel implements Runnable {
     }
 
     public void update() {
-
+        gsm.update();
     }
 
-    public void input() {
-
+    public void input(MouseHandler mouse, KeyHandler key) {
+        gsm.input(mouse, key);
     }
 
     public void render() {
         if (g != null) {
             g.setColor(new Color(66, 134, 244));
             g.fillRect(0, 0, width, height);
+            gsm.render(g);
         }
     }
 
